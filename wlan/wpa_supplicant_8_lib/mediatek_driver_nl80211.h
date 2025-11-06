@@ -19,12 +19,6 @@
 
 #define OUI_MTK 0x000CE7
 
-#define BUG_REPORT_NUM 47
-
-#define IW_ENCODE_ALG_SMS4 0x20
-
-#define IW_ETH_ALEN (6)
-
 extern void nl80211_vendor_event_mtk(struct wpa_driver_nl80211_data*, u32, u8*, size_t);
 
 enum nl80211_testmode_sta_link_statistics_attr {
@@ -33,31 +27,59 @@ enum nl80211_testmode_sta_link_statistics_attr {
     NL80211_TESTMODE_STA_STATISTICS_MAC,
     NL80211_TESTMODE_STA_STATISTICS_LINK_SCORE,
     NL80211_TESTMODE_STA_STATISTICS_FLAG,
+
     NL80211_TESTMODE_STA_STATISTICS_PER,
     NL80211_TESTMODE_STA_STATISTICS_RSSI,
     NL80211_TESTMODE_STA_STATISTICS_PHY_MODE,
     NL80211_TESTMODE_STA_STATISTICS_TX_RATE,
+
     NL80211_TESTMODE_STA_STATISTICS_TOTAL_CNT,
     NL80211_TESTMODE_STA_STATISTICS_THRESHOLD_CNT,
+
     NL80211_TESTMODE_STA_STATISTICS_AVG_PROCESS_TIME,
     NL80211_TESTMODE_STA_STATISTICS_MAX_PROCESS_TIME,
     NL80211_TESTMODE_STA_STATISTICS_AVG_HIF_PROCESS_TIME,
     NL80211_TESTMODE_STA_STATISTICS_MAX_HIF_PROCESS_TIME,
+
     NL80211_TESTMODE_STA_STATISTICS_FAIL_CNT,
     NL80211_TESTMODE_STA_STATISTICS_TIMEOUT_CNT,
     NL80211_TESTMODE_STA_STATISTICS_AVG_AIR_TIME,
+
     NL80211_TESTMODE_STA_STATISTICS_TC_EMPTY_CNT_ARRAY,
     NL80211_TESTMODE_STA_STATISTICS_TC_QUE_LEN_ARRAY,
+
     NL80211_TESTMODE_STA_STATISTICS_TC_AVG_QUE_LEN_ARRAY,
     NL80211_TESTMODE_STA_STATISTICS_TC_CUR_QUE_LEN_ARRAY,
+
+    /*
+     * how many packages TX during statistics interval
+     */
     NL80211_TESTMODE_STA_STATISTICS_ENQUEUE,
+
+    /*
+     * how many packages TX during statistics interval
+     */
     NL80211_TESTMODE_STA_STATISTICS_STA_ENQUEUE,
+
+    /*
+     * how many packages dequeue during statistics interval
+     */
     NL80211_TESTMODE_STA_STATISTICS_DEQUEUE,
+
+    /*
+     * how many packages dequeue during statistics interval
+     */
     NL80211_TESTMODE_STA_STATISTICS_STA_DEQUEUE,
+
+    /*
+     * how many TC[0-3] resource back from firmware during
+     * statistics interval
+     */
     NL80211_TESTMODE_STA_STATISTICS_RB_ARRAY,
     NL80211_TESTMODE_STA_STATISTICS_NO_TC_ARRAY,
     NL80211_TESTMODE_STA_STATISTICS_TC_USED_ARRAY,
     NL80211_TESTMODE_STA_STATISTICS_TC_WANTED_ARRAY,
+
     NL80211_TESTMODE_STA_STATISTICS_IRQ_ISR_CNT,
     NL80211_TESTMODE_STA_STATISTICS_IRQ_ISR_PASS_CNT,
     NL80211_TESTMODE_STA_STATISTICS_IRQ_TASK_CNT,
@@ -65,7 +87,9 @@ enum nl80211_testmode_sta_link_statistics_attr {
     NL80211_TESTMODE_STA_STATISTICS_IRQ_SW_CNT,
     NL80211_TESTMODE_STA_STATISTICS_IRQ_TX_CNT,
     NL80211_TESTMODE_STA_STATISTICS_IRQ_RX_CNT,
+
     NL80211_TESTMODE_STA_STATISTICS_RESERVED_ARRAY,
+
     NL80211_TESTMODE_STA_STATISTICS_NUM,
     NL80211_TESTMODE_STA_STATISTICS_MAX = NL80211_TESTMODE_STA_STATISTICS_NUM - 1
 };
@@ -94,6 +118,29 @@ enum nl80211_testmode_link_detect_attr {
     NL80211_TESTMODE_LINK_DETECT_MAX = NL80211_TESTMODE_LINK_DETECT_NUM - 1
 };
 
+#define BUG_REPORT_NUM 47
+
+enum mtk_nl80211_vendor_subcmd {
+    /* defined in wifi hal */
+    MTK_SUBCMD_TRIGGER_RESET = 1,
+    MTK_SUBCMD_NAN = 12,
+    MTK_SUBCMD_SET_SCAN_PARAM = 13,
+    MTK_SUBCMD_GET_APF_CAPABILITIES = 14,
+    MTK_SUBCMD_SET_PACKET_FILTER = 15,
+    MTK_SUBCMD_READ_PACKET_FILTER = 16,
+    MTK_SUBCMD_GET_TRX_STATS = 48,
+    MTK_SUBCMD_NDP = 81,
+    /* End of defined in wifi hal */
+
+    MTK_SUBCMD_STRING_CMD = 0x2454,
+};
+
+enum mtk_string_attribute {
+    STRING_ATTRIBUTE_INVALID = 0,
+    STRING_ATTRIBUTE_DATA = 1,
+    STRING_ATTRIBUTE_MAX = 2
+};
+
 typedef enum _ENUM_TRAFFIC_CLASS_INDEX_T {
     TC0_INDEX = 0,
     TC1_INDEX,
@@ -109,30 +156,50 @@ struct wpa_driver_sta_statistics_s {
     u8 version;
     u8 addr[ETH_ALEN];
     u32 flag;
+
     u32 link_score;
     u8 per;
     int rssi;
     u32 phy_mode;
     double tx_rate;
+
     u32 tx_total_cnt;
     u32 enqueue_total_cnt;
     u32 dequeue_total_cnt;
     u32 enqueue_sta_total_cnt;
     u32 dequeue_sta_total_cnt;
     u32 tx_exc_threshold_cnt;
+
     u32 tx_avg_process_time;
     u32 tx_max_process_time;
     u32 tx_avg_hif_process_time;
     u32 tx_max_hif_process_time;
+
     u32 tx_fail_cnt;
     u32 tx_timeout_cnt;
     u32 tx_avg_air_time;
+
     u32 tc_buf_full_cnt[TC_DATA_NUM];
     u32 tc_que_len[TC_DATA_NUM];
+
+    /*
+     * how many TC[0-3] resource back from firmware during
+     * statistics intervals
+     */
     u32 tc_back_count[TC_DATA_NUM];
+
+    /*
+     * how many times that no TC[0-3] resource when dequeue
+     * statistics intervals
+     */
     u32 dequeue_no_tc_res[TC_DATA_NUM];
     u32 tc_wanted_res[TC_DATA_NUM];
     u32 tc_used_res[TC_DATA_NUM];
+
+    /*
+     * wlan interrupt info
+     * statistics intervals
+     */
     u32 isr_cnt;
     u32 isr_pass_cnt;
     u32 isr_task_cnt;
@@ -140,8 +207,10 @@ struct wpa_driver_sta_statistics_s {
     u32 isr_sw_cnt;
     u32 isr_tx_cnt;
     u32 isr_rx_cnt;
+
     u32 tc_avg_que_len[TC_DATA_NUM];
     u32 tc_cur_que_len[TC_DATA_NUM];
+
     u8 reserved[32];
 };
 
@@ -176,6 +245,10 @@ struct wpa_driver_cmd_reply_s {
     } reply_buf;
 };
 
+/* SIOCSIWENCODEEXT definitions */
+#define IW_ENCODE_ALG_SMS4 0x20
+
+/* P2P Sigma*/
 struct wpa_driver_test_mode_info {
     u32 index;
     u32 buflen;
@@ -210,6 +283,7 @@ struct wpa_driver_get_sta_link_detect_params {
     u8* buf;
 };
 
+/* Hotspot Client Management */
 struct wpa_driver_hotspot_params {
     struct wpa_driver_test_mode_info hdr;
     u8 blocked;
@@ -222,6 +296,7 @@ struct wpa_driver_hotspot_set_config_params {
     u32 value;
 };
 
+/* SW CMD */
 struct wpa_driver_sw_cmd_params {
     struct wpa_driver_test_mode_info hdr;
     u8 set;
@@ -235,25 +310,29 @@ struct wpa_driver_suspendmode_params {
 };
 
 struct wpa_pmkid_entry {
-    u8 bssid[IW_ETH_ALEN];
-    u8 sta[IW_ETH_ALEN];
-    u8 pmkid[IW_PMKID_LEN];
-    u8 addremove;
-};
-struct wpa_driver_pmkid_entry {
-    struct wpa_driver_test_mode_info hdr;
-    u8 bssid[IW_ETH_ALEN];
-    u8 sta[IW_ETH_ALEN];
-    u8 pmkid[IW_PMKID_LEN];
-    u8 addremove;
+    u8 bssid[ETH_ALEN];
+    u8 sta[ETH_ALEN];
+    u8 pmkid[PMKID_LEN];
+    u8 addremove; /*1- ADD, 0- Remove*/
 };
 
+struct wpa_driver_pmkid_entry {
+    struct wpa_driver_test_mode_info hdr;
+    u8 bssid[ETH_ALEN];
+    u8 sta[ETH_ALEN];
+    u8 pmkid[PMKID_LEN];
+    u8 addremove; /*1- ADD, 0- Remove*/
+};
+
+/* WAPI */
 struct iw_encode_exts {
-    u32 ext_flags;
-    u8 tx_seq[IW_ENCODE_SEQ_MAX_SIZE];
-    u8 rx_seq[IW_ENCODE_SEQ_MAX_SIZE];
-    u8 addr[ETH_ALEN];
-    u16 alg;
+    u32 ext_flags;                     /* IW_ENCODE_EXT_* */
+    u8 tx_seq[IW_ENCODE_SEQ_MAX_SIZE]; /* LSB first */
+    u8 rx_seq[IW_ENCODE_SEQ_MAX_SIZE]; /* LSB first */
+    u8 addr[ETH_ALEN];                 /* ff:ff:ff:ff:ff:ff for broadcast/multicast
+                                        * (group) keys or unicast address for
+                                        * individual keys */
+    u16 alg;                           /* IW_ENCODE_ALG_* */
     u16 key_len;
     u8 key[32];
 };
@@ -275,6 +354,7 @@ struct wpa_driver_wapi_key_params {
     struct iw_encode_exts extparams;
 };
 
+/* CONFIG_MTK_P2P */
 struct wpa_driver_wfd_data_s {
     struct wpa_driver_test_mode_info hdr;
     u32 WfdCmdType;
@@ -295,18 +375,21 @@ struct wpa_driver_wfd_data_s {
     u32 WfdFlag;
     u32 WfdPolicy;
     u32 WfdState;
-    u8 WfdSessionInformationIE[24 * 8];
+    u8 WfdSessionInformationIE[24 * 8]; /* Include Subelement ID, length */
     u16 WfdSessionInformationIELen;
     u8 Reverved1[2];
     u8 WfdPrimarySinkMac[ETH_ALEN];
     u8 WfdSecondarySinkMac[ETH_ALEN];
     u32 WfdAdvancedFlag;
+    /* Group 1 64 bytes */
     u8 WfdLocalIp[4];
-    u16 WfdLifetimeAc2;
-    u16 WfdLifetimeAc3;
-    u16 WfdCounterThreshold;
+    u16 WfdLifetimeAc2;      /* Unit is 2 TU */
+    u16 WfdLifetimeAc3;      /* Unit is 2 TU */
+    u16 WfdCounterThreshold; /* Unit is ms */
     u8 Reverved2[54];
+    /* Group 2 64 bytes */
     u8 Reverved3[64];
+    /* Group 3 64 bytes */
     u8 Reverved4[64];
 } wfd_data;
 
@@ -316,13 +399,18 @@ struct wpa_driver_set_beamplus_params {
 };
 
 enum nl80211_testmode_params {
+    /* Old test mode command id, compatible with exist testmode command */
     NL80211_TESTMODE_SW_CMD = 1,
     NL80211_TESTMODE_WAPI = 2,
     NL80211_TESTMODE_HS20 = 3,
     NL80211_TESTMODE_POORLINK = 4,
     NL80211_TESTMODE_STATISTICS = 0x10,
     NL80211_TESTMODE_LINK_DETECT = 0x20,
+
+    // Hotspot manager testmode command
     NL80211_TESTMODE_HS_SET_CONFIG = 51,
+
+    /* New test mode command id, should greater than TESTMODE_CMD_ID_NEW_BEGIN */
     NL80211_TESTMODE_NEW_BEGIN = 100,
     NL80211_TESTMODE_SUSPEND = 101,
     NL80211_TESTMODE_STR_CMD = 102,
@@ -337,8 +425,28 @@ enum mtk_nl80211_vendor_subcmds {
 
 enum mtk_wlan_vendor_attr_driver_error {
     MTK_WALN_VENDOR_ATTR_DRIVER_ERROR_DATA_STALL_NOTICE = 0,
+    /* keep last */
     MTK_WALN_VENDOR_ATTR_DRIVER_ERROR_AFTER_LAST,
     MTK_WALN_VENDOR_ATTR_DRIVER_ERROR_MAX = MTK_WALN_VENDOR_ATTR_DRIVER_ERROR_AFTER_LAST - 1
 };
+
+enum mtk_generic_response_element {
+    MTK_GRID_MANAGE_CHANNEL_LIST,  /* 0 */
+    MTK_GRID_HANG_INFO,            /* 1 */
+    MTK_GRID_SWPIS_BCN_INFO,       /* 2 */
+    MTK_GRID_SWPIS_BCN_INFO_ABORT, /* 3 */
+    MTK_GRID_EXTERNAL_AUTH,        /* 4 */
+};
+
+struct mtk_externa_auth_info {
+    uint8_t ssid[SSID_MAX_LEN + 1];
+    uint8_t ssid_len;
+    uint8_t bssid[ETH_ALEN];
+    uint32_t key_mgmt_suite;
+    uint32_t action;
+    uint8_t dot11MultiLinkActivated;
+    uint8_t own_ml_addr[ETH_ALEN];
+    uint8_t peer_ml_addr[ETH_ALEN];
+} STRUCT_PACKED;
 
 #endif

@@ -6,18 +6,10 @@
 cc_library_static {
     name: "lib_driver_cmd_mt66xx",
     vendor: true,
-    owner: "mtk",
     sanitize: {
         cfi: true,
     },
-    cflags: [
-        "-DCONFIG_ANDROID_LOG",
-    ],
-    arch: {
-        arm: {
-            cflags: ["-mabi=aapcs-linux"],
-        },
-    },
+    cflags: ["-DCONFIG_MTK_P2P_SIGMA"],
     srcs: ["mediatek_driver_cmd_nl80211.c"],
     shared_libs: [
         "libc",
