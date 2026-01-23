@@ -1,0 +1,24 @@
+//
+// Copyright (C) 2026 The LineageOS Project
+//
+// SPDX-License-Identifier: Apache-2.0
+//
+
+java_library {
+    name: "mediatek-common",
+    system_ext_specific: true,
+    installable: true,
+
+    srcs: [
+        "src/**/*.java",
+    ],
+
+    required: ["mediatek-common.xml"],
+}
+
+prebuilt_etc {
+    name: "mediatek-common.xml",
+    src: "mediatek-common.xml",
+    sub_dir: "permissions",
+    system_ext_specific: true,
+}
